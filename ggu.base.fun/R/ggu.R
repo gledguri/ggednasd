@@ -536,7 +536,6 @@ rowpaste <- function(inn){
 manually_annotate <- function(input,method=1,skip=T,print_blast=T,query_vector=NA){ #Method 1: "Conservative; Methood 2: "Semiconservative"; Method 3: "Automatic"
 
 if (!require("devtools")) {install.packages("devtools",dependencies = TRUE);require("devtools")}
-if (!require("gled.functions")) {require("devtools");devtools::install_github("gledguri/ggednasd/gled.functions");require("gled.functions")}
 if (!require("dplyr")) {install.packages("dplyr",dependencies = TRUE);require("dplyr")}
 if (!require("coda")) {install.packages("coda",dependencies = TRUE);require("coda")}
 if (!require("vctrs")) {install.packages("vctrs",dependencies = TRUE);require("vctrs")}
