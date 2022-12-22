@@ -469,8 +469,6 @@ pr_df <- function(vector_var,wide=40,new_row=F){
 #' taxa_removed <- clean.otu(otu,tax)
 
 clean.otu<-function(otu,tax){
-  if (print_empty_rows==T)
-    return(tax[!rowSums(otu)>0,])
   tax<<-tax[rowSums(otu)>0,]
   otu<<-otu[rowSums(otu)>0,]
 }
