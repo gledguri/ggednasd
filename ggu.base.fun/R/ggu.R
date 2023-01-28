@@ -497,8 +497,39 @@ inv.trans <- function(input.X,input.Y,input.Z){
   return(output)
 }
 
+#' Sequence developer
+#'
+#' This function creates a sequence of numbers from 1:k when i=0 and k+1:2k 
+#' This is very handy when you want to slice data into fragments 
+#' @param k the length of the sequence of numbers
+#' @param i the loop factor
+#' @return A vector of a sequence of numbers k-long
+#' @export
+#' @examples
+#' seq_dev(100,0)
+#' seq_dev(100,1)
+#' for(i in 0:3) vector[i] <- seq_dev(100,i)
+seq_dev <- function(k,i) ((k*i)+1):((k*i)+k)
 
-
+#' eDNA data to fasta
+#'
+#' This function creates fasta sequences from edna reads
+#' This is very handy when you want to reblast some sequences
+#' @param qid The vector containig the query ID
+#' @param seq The vector containig the sequences
+#' @param output the name of the output file
+#' @return A fasta file with extenxtion .fasta
+#' @export
+#' @examples
+#' # edna_to_fasta(edna$id,edna$sequence,"Plate_NANB.fasta")
+if (!require("seqinr")) {install.packages("seqinr",dependencies = TRUE);require("seqinr")}
+edna_to_fasta <- function(qid,seq,output="out.fasta"){
+  capture.output(
+    for (i in 1:length(qid)) writeLines(paste0(">query",qid[i],";","\n",seq[i])),
+    append = F,type = "output",file = "temp.fasta")
+  st <- read.fasta("temp.fasta")
+  write.fasta(st, qid,file.out = output);unlink("temp.fasta")
+}
 
 #' Row Paste
 #'
