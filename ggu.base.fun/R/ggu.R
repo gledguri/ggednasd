@@ -14,6 +14,17 @@ colur<-function(n){
   return(temp1)
 }
 
+#' Spectrum colours
+#'
+#' This function generates n number of colours that are in a spectrum
+#' @param n The number of colours to be produced
+#' @return R vector
+#' @export
+#' @examples
+#' colspectrum(5)
+#' [1] "#FF0000" "#FFBF00" "#7FFF3F" "#10D997" "#4169E1"
+colspectrum <- colorRampPalette(c("red","yellow","springgreen","royalblue"))
+
 
 #' Unique duplicated names
 #'
