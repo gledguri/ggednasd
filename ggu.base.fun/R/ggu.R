@@ -15,6 +15,20 @@ colur<-function(n){
 }
 
 
+#' Unique duplicated names
+#'
+#' This function creates unique names for all the duplicated values. It takes into account the first duplicate value/name as well
+#' @param x the text string containing duplicated values
+#' @param sep the seperation character
+#' @return text string
+#' @export
+#' @examples
+#' make.unique.2(species_names)
+#' make.unique.2(edna$genus_name)
+
+make.unique.2 = function(x, sep='.'){
+  ave(x, x, FUN=function(a){if(length(a) > 1){paste(a, 1:length(a), sep=sep)} else {a}})
+}
 
 #' Generates string text with colours
 #'
@@ -26,7 +40,6 @@ colur<-function(n){
 #' @examples
 #' questions("hehehe")
 #' hehehe (colored)
-
 
 questions <- function(input,col=43){
   cat(paste0("\033[0;", col, "m", input,"\033[0m"))
