@@ -7,13 +7,13 @@
 logit(x)
 }
 \arguments{
-\item{x}{The value in normal scale}
+\item{x}{The value in normal scale \link{0:1} values}
 }
 \value{
 The vale on the logit scale
 }
 \description{
-This function returns the logit value
+This function returns the logit value. This function transforms values between 0 and 1 into logit-scale values
 }
 \examples{
 logit(0.01)

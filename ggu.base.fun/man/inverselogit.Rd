@@ -10,10 +10,10 @@ inverselogit(x)
 \item{x}{The value in logit scale}
 }
 \value{
-The vale on the normal scale
+The backtransformed vale on the normal scale \link{0:1}
 }
 \description{
-This function returns the inverse logit value
+This function returns the inverse logit value. This function transforms values from logit into values between 0 and 1
 }
 \examples{
 inverselogit(0.01)
