@@ -422,6 +422,44 @@ logit <- function(x){
   return(log(x/(1-x)))
 }
 
+#' Stan code into PDF converter
+#'
+#' This function prints out a PDF file with the stan code. The stan output from running the 
+#' stan(file,data) function in 'rstan' package contains the Stan code used for generating the output,
+#' thus that code will be compiled into a PDF file.
+#' @param stanMod The stan model output where the compiled stan code is.
+#' @param title A title for the PDF file
+#' @return A PDF file in your working directory getwd() with the title given
+#' @export
+#' @examples
+#' stan_code_pdf(stanMod,"Model_1")
+
+##To be added/modified into the package
+stan_code_pdf <- function(stanMod,title){
+  if (!require("knitr")) {install.packages("knitr",dependencies = TRUE);require("knitr")}
+  if (!require("rmarkdown")) {install.packages("rmarkdown",dependencies = TRUE);require("rmarkdown")}
+  if (!require("rstan")) {install.packages("rstan",dependencies = TRUE);require("rstan")}
+  
+  # create a temporary RMarkdown file
+  rmd_file <- paste0(getwd(),"/delete.Rmd") #If you want to save the Rmd file
+  file.create(rmd_file)
+  
+  # write the Stan code to the temporary RMarkdown file
+  cat("```{stan output.var = \"my_model\", eval = FALSE}\n",
+      paste0(get_stancode(stanMod),collapse = "\n"),
+      "\n```", file = rmd_file, sep = "\n")
+  #This works for sure
+  # cat("```{stan output.var = \"my_model\", eval = FALSE}\n",
+  #     paste0(readLines(stan_file),collapse = "\n"),
+  #     "\n```", file = rmd_file, sep = "\n")
+  
+  # convert the RMarkdown file to a PDF file
+  render(rmd_file, output_file = paste0(getwd(),"/",title,"_code.pdf"), output_format = "pdf_document",knit_meta = FALSE)
+  
+  unlink(rmd_file)
+}
+
+
 #' Match multiple inputs (grep in for multiple variables at once)
 #'
 #' This function serches and matches multiple inputs at once
