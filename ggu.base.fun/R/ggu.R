@@ -25,6 +25,31 @@ colur<-function(n){
 #' [1] "#FF0000" "#FFBF00" "#7FFF3F" "#10D997" "#4169E1"
 colspectrum <- colorRampPalette(c("red","yellow","springgreen","royalblue"))
 
+#' Check of dimentions of otu, mm, and tax
+#'
+#' This function checks that otu table, metadata (mm) table and the tax table are on the same dimensions.
+#' That means checking if there are the same number of species on the otu table that they are in the tax table.
+#' And it also checks that there are the same number of stations in otu table and metadata (mm)
+#' @param otu The number of colours to be produced
+#' @param mm The number of colours to be produced
+#' @param tax The number of colours to be produced
+#' @return message output
+#' @export
+#' @examples
+#' dimentions(otu,mm,tax)
+
+dimentions <- function(otu=otu,mm=mm,tax=tax){
+  if(dim(mm)[1]==dim(otu)[2]){
+    printbold("same dimentions (OTU and Metadata)",60,32)
+  }else if(dim(mm)[1]!=dim(otu)[2]){
+    printbold("NOT the same dimentions (OTU and Metadata)",60,31)
+  }
+  if(dim(tax)[1]==dim(otu)[1]){
+    printbold("same dimentions (OTU and TAX)",60,32)
+  }else if(dim(tax)[1]!=dim(otu)[1]){
+    printbold("NOT the same dimentions (OTU and TAX)",60,31)
+  }
+}
 
 #' Unique duplicated names
 #'
