@@ -337,6 +337,30 @@ merr <- function(input.x,input.y,input.yy){
 
 
 
+#' Joins values from another dataframe
+#'
+#' This function matches 2 vectors of different dataframes and joins the values attached to the second vector
+#' @param input.x The vector which the values will be joined to
+#' @param input.y The bridge vector. The vector that has the same as the first vector and rows correspond to values that will be joined
+#' @param input.yy The vector which contains the values that will be joined
+#' @return generates a vector with only joined values ordered for corresponding to the first vectgor
+#' @export
+#' @examples
+#' mm$category <- merr2(mm$samp_cat,category.transformation$samp_cat,category.transformation$category)
+
+merr2 <- function (input.x, input.y, input.yy) 
+{
+  yy <- vector(mode = "character", length = length(input.x))
+  for (i in 1:length(input.x)) {
+    if(input.x[i] %in% input.y){
+      yy[i] <- input.yy[input.x[i] == input.y]
+    }else{
+      yy[i] <- yy[i]
+    }
+  }
+  return(yy)
+}
+
 
 
 #' Print bold
