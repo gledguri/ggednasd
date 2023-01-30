@@ -14,6 +14,32 @@ colur<-function(n){
   return(temp1)
 }
 
+#' Backtransforms the logit values
+#'
+#' This function transforms values from logit into values between 0 and 1
+#' @param n The number/vector that has logit values
+#' @return R number or vector with backtransformed logit values
+#' @export
+#' @examples
+#' inverselogit(4)
+
+inverselogit <- function(x){
+  return(1/(1+exp(-x)))
+}
+
+#' Transforms values into logit-scale
+#'
+#' This function transforms values between 0 and 1 into logit-scale values
+#' @param n The number/vector that has [0:1] values
+#' @return R number or vector with logit values
+#' @export
+#' @examples
+#' logit(4)
+logit <- function(x){
+  return(log(x/(1-x)))
+}
+
+
 #' Generates string text with colours
 #'
 #' This function returns a text with colourw
