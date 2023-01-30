@@ -14,30 +14,6 @@ colur<-function(n){
   return(temp1)
 }
 
-#' Backtransforms the logit values
-#'
-#' This function transforms values from logit into values between 0 and 1
-#' @param n The number/vector that has logit values
-#' @return R number or vector with backtransformed logit values
-#' @export
-#' @examples
-#' inverselogit(4)
-
-inverselogit <- function(x){
-  return(1/(1+exp(-x)))
-}
-
-#' Transforms values into logit-scale
-#'
-#' This function transforms values between 0 and 1 into logit-scale values
-#' @param n The number/vector that has [0:1] values
-#' @return R number or vector with logit values
-#' @export
-#' @examples
-#' logit(4)
-logit <- function(x){
-  return(log(x/(1-x)))
-}
 
 
 #' Generates string text with colours
@@ -399,9 +375,9 @@ for (i in 29:49) {
 
 #' Inverse logit function
 #'
-#' This function returns the inverse logit value
+#' This function returns the inverse logit value. This function transforms values from logit into values between 0 and 1
 #' @param x The value in logit scale
-#' @return The vale on the normal scale
+#' @return The backtransformed vale on the normal scale [0:1]
 #' @export
 #' @examples
 #' inverselogit(0.01)
@@ -412,8 +388,8 @@ inverselogit <- function(x){
 
 #' Logit function
 #'
-#' This function returns the logit value
-#' @param x The value in normal scale
+#' This function returns the logit value. This function transforms values between 0 and 1 into logit-scale values
+#' @param x The value in normal scale [0:1] values
 #' @return The vale on the logit scale
 #' @export
 #' @examples
@@ -421,6 +397,7 @@ inverselogit <- function(x){
 logit <- function(x){
   return(log(x/(1-x)))
 }
+
 
 #' Stan code into PDF converter
 #'
