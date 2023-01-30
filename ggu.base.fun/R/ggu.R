@@ -548,8 +548,9 @@ seq_dev <- function(k,i) ((k*i)+1):((k*i)+k)
 #' @export
 #' @examples
 #' # edna_to_fasta(edna$id,edna$sequence,"Plate_NANB.fasta")
-if (!require("seqinr")) {install.packages("seqinr",dependencies = TRUE);require("seqinr")}
 edna_to_fasta <- function(qid,seq,output="out.fasta"){
+if (!require("seqinr")) {install.packages("seqinr",dependencies = TRUE);require("seqinr")}
+if (!require("utils")) {install.packages("utils",dependencies = TRUE);require("utils")}
   capture.output(
     for (i in 1:length(qid)) writeLines(paste0(">query",qid[i],";","\n",seq[i])),
     append = F,type = "output",file = "temp.fasta")
