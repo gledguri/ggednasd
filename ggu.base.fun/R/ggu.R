@@ -459,6 +459,20 @@ inverselogit <- function(x){
   return(1/(1+exp(-x)))
 }
 
+#' Extract the Stan model parameter names
+#'
+#' This function extracts the names of the parameters from a Stan model output in R
+#' @param stanMod The stan model as a S4 (Stan list)
+#' @return A vector of all the names from the parameter
+#' @export
+#' @examples
+#' param.extract(stanMod)
+#' [1] "phi_0" "phi_1" "theta" "lp__" 
+
+param.extract <- function(stanMod){
+  return(unique(gsub("\\[\\d+\\]","",unique(names(stanMod)))))
+}
+
 #' Logit function
 #'
 #' This function returns the logit value. This function transforms values between 0 and 1 into logit-scale values
