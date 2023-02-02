@@ -51,6 +51,101 @@ dimentions <- function(otu=otu,mm=mm,tax=tax){
   }
 }
 
+#' Collapse similar rows on a dataframe
+#'
+#' This function collapses similar rows or based on an index. If the db is a vector then the vector will 
+#' be collapsed to a shorter vector based on the sim vector
+#' @param db The dataframe or vector that should be collapsed
+#' @param sim The vector indicating similarities
+#' @return A dataframe or vector containing the collapsed(unique) valued
+#' @export
+#' @examples
+#' collapse_similar_rows(edna[,st:end],edna$tax_id)
+
+collapse_similar_rows <- function(db,sim){
+  db <- as.data.frame(db)
+  cat("Collapsing based on similar names \n")
+  if(length(sim)!=nrow(db)){cat("The argument is not the same length as the data")}
+  l <- unique(sim); #l <- l[-1]
+  collapse <- data.frame(matrix(0, length(l), ncol(db)))
+  colnames(collapse) <- "factor"
+  rownames(collapse) <- l
+  for (i in 1:length(l)) {
+    k <- unique(db[sim%in%l[i],])
+    if(length(k)>1){cat("Multiple factors were detected for factor",i)}
+    collapse[i,] <- k[1]
+    if(length(k)>1){cat(k[1],"was assigned for factor",i)}
+  }
+  return(collapse)
+}
+
+
+#' Collapse similar columns on a dataframe
+#'
+#' This function collapses similar columns or based on an identical column names. It is important to have the column names
+#' similar for those columns that needs to be collapsed
+#' @param db The dataframe that columns should be collapsed
+#' @return A dataframe containing the collapsed dataframe. If the dataframe is not balanced then NA's will be created for those columns that have less observation
+#' @export
+#' @examples
+#' as.data.frame(extract(stanMod, par = parameter))
+#' colnames(param) <- paste0(factor1,"_",factor2)
+#' collapse_similar_columns(param)
+
+collapse_similar_columns <- function(db){
+  cat("Collapsing based on similar column names \n")
+  k <- unique(colnames(db));
+  if(sum(duplicated(colnames(db)))>0){
+    temp_row <- max(as.numeric(str_split(make.unique.2(colnames(db),";"), ";", simplify=T)[,2]))*nrow(db)
+  }else{
+    temp_row <- nrow(db)
+  }
+  temp <- as.data.frame(matrix(NA,temp_row,length(k)))
+  colnames(temp) <- k
+  
+  for (i in k) {
+    j <- as.numeric(as_vector(db[,which(colnames(db)%in%i)]))
+    temp[(1:length(j)),i] <- j
+  }
+  return(temp)
+}  
+
+
+#' Prepare the parameters output from stanMod for ridgit plots
+#'
+#' This function conducts data manipulation for transforming the parameters output from stanMod into a format that 
+#' required for geom_density_ridges() in ggplot2.
+#' @param parameter The name of the parameter that will be used to be extracted
+#' @param fa1 Factor 1
+#' @param fa2 Factor 2
+#' @param faidx The vector which the parameter has been indexed in the stanModel 
+#' @param x Factor 1 on the y axis
+#' @param y Factor 2 as different colours
+#' @return A dataframe ready to be as the input for geom_density_ridges() in ggplot2
+#' @export
+#' @examples
+#' tparam <- prep_ridg_plot(parameter,fa1,fa2,faidx,2,1)
+#' ggplot(tparam,aes(x = `Z`, y = `X`, fill = `Y`))+#
+#' geom_density_ridges(scale = 2,size = 0.2,rel_min_height = 0.01,alpha = .8)
+
+prep_ridg_plot <- function(parameter,fa1,fa2,faidx,x=2,y=1){
+  fa1 <- collapse_similar(fa1,faidx)$factor
+  fa2 <- collapse_similar(fa2,faidx)$factor
+  
+  param <- as.data.frame(extract(stanMod, par = parameter))
+  colnames(param) <- paste0(fa1,"@",fa2)
+  
+  paramtemp <- collapse_similar_columns(param)
+  
+  tparam <- trans(paramtemp)
+  tparam <- (tparam[!is.na(tparam$Z),])
+  tparam$X <- str_split(tparam$Y, "\\@", simplify=T)[,x]
+  tparam$Y <- str_split(tparam$Y, "\\@", simplify=T)[,y]
+  tparam$X <- factor((tparam$X),level=rev(unique(tparam$X)))
+  tparam$Y <- factor((tparam$Y),level=rev(unique(tparam$Y)))
+  return(tparam)
+}
+
 #' Unique duplicated names
 #'
 #' This function creates unique names for all the duplicated values. It takes into account the first duplicate value/name as well
