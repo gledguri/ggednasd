@@ -106,7 +106,7 @@ collapse_similar_columns <- function(db){
   colnames(temp) <- k
   
   for (i in k) {
-    j <- as.numeric(as_vector(db[,which(colnames(db)%in%i)]))
+    j <- as.numeric(as.vector(db[,which(colnames(db)%in%i)]))
     temp[(1:length(j)),i] <- j
   }
   return(temp)
