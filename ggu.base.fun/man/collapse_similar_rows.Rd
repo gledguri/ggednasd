@@ -4,7 +4,7 @@
 \alias{collapse_similar_rows}
 \title{Collapse similar rows on a dataframe}
 \usage{
-collapse_similar_rows(db, sim)
+collapse_similar_rows(db, sim, sort = T)
 }
 \arguments{
 \item{db}{The dataframe or vector that should be collapsed}
