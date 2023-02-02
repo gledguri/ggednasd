@@ -129,8 +129,8 @@ collapse_similar_columns <- function(db){
 #' geom_density_ridges(scale = 2,size = 0.2,rel_min_height = 0.01,alpha = .8)
 
 prep_ridg_plot <- function(parameter,fa1,fa2,faidx,x=2,y=1){
-  fa1 <- collapse_similar(fa1,faidx)$factor
-  fa2 <- collapse_similar(fa2,faidx)$factor
+  fa1 <- collapse_similar_rows(fa1,faidx)$factor
+  fa2 <- collapse_similar_rows(fa2,faidx)$factor
   
   param <- as.data.frame(extract(stanMod, par = parameter))
   colnames(param) <- paste0(fa1,"@",fa2)
