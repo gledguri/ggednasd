@@ -62,11 +62,12 @@ dimentions <- function(otu=otu,mm=mm,tax=tax){
 #' @examples
 #' collapse_similar_rows(edna[,st:end],edna$tax_id)
 
-collapse_similar_rows <- function(db,sim){
+collapse_similar_rows <- function(db,sim,sort=T){
   db <- as.data.frame(db)
   cat("Collapsing based on similar names \n")
   if(length(sim)!=nrow(db)){cat("The argument is not the same length as the data")}
-  l <- unique(sim); #l <- l[-1]
+  if(sort==T){l <- sort(unique(sim))}
+  if(sort==F){l <- unique(sim)}
   collapse <- data.frame(matrix(0, length(l), ncol(db)))
   colnames(collapse) <- "factor"
   rownames(collapse) <- l
