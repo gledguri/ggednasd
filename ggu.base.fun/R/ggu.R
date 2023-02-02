@@ -93,6 +93,8 @@ collapse_similar_rows <- function(db,sim){
 #' collapse_similar_columns(param)
 
 collapse_similar_columns <- function(db){
+  if (!require("stringr")) {install.packages("stringr",dependencies = TRUE);require("stringr")}
+
   cat("Collapsing based on similar column names \n")
   k <- unique(colnames(db));
   if(sum(duplicated(colnames(db)))>0){
@@ -129,6 +131,8 @@ collapse_similar_columns <- function(db){
 #' geom_density_ridges(scale = 2,size = 0.2,rel_min_height = 0.01,alpha = .8)
 
 prep_ridg_plot <- function(parameter,fa1,fa2,faidx,x=2,y=1){
+  if (!require("stringr")) {install.packages("stringr",dependencies = TRUE);require("stringr")}
+
   fa1 <- collapse_similar_rows(fa1,faidx)$factor
   fa2 <- collapse_similar_rows(fa2,faidx)$factor
   
