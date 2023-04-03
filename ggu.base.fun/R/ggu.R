@@ -913,7 +913,7 @@ if (!require("stringr")) {install.packages("stringr",dependencies = TRUE);requir
         #Esthetics
         setTxtProgressBar(pb,j);cat("\n") #progress bar
         j <- j+1 #loop mechanism
-        write.csv(input,"manually_annotated_function_outcome.csv",row.names = FALSE)
+        # write.csv(input,"manually_annotated_function_outcome.csv",row.names = FALSE)
       } #Not skipping method 1
     } #Loop of method 1
   } #Method 1
@@ -1065,7 +1065,7 @@ if (!require("stringr")) {install.packages("stringr",dependencies = TRUE);requir
         #Esthetics
         setTxtProgressBar(pb,j);cat("\n") #progress bar
         j <- j+1 #loop mechanism
-        write.csv(input,"manually_annotated_function_outcome.csv",row.names = F)
+        # write.csv(input,"manually_annotated_function_outcome.csv",row.names = F)
       } #Not skipping method 2
     } #Loop of method 2
   } #Method 2
@@ -1160,7 +1160,7 @@ if (!require("stringr")) {install.packages("stringr",dependencies = TRUE);requir
         #Esthetics
         setTxtProgressBar(pb,j);cat("\n") #progress bar
         j <- j+1 #loop mechanism
-        write.csv(input,"manually_annotated_function_outcome.csv",row.names = F)
+        # write.csv(input,"manually_annotated_function_outcome.csv",row.names = F)
       } #Not skipping method 3
     } #Loop of method 3
   } #Method 3
@@ -1170,7 +1170,7 @@ if (!require("stringr")) {install.packages("stringr",dependencies = TRUE);requir
     ret_df[ret_df$qseqid==ii,2] <- unique(input$annotated_tax[input$qseqid==ii])  
     ret_df[ret_df$qseqid==ii,3] <- unique(input$pmatchsel[input$qseqid==ii])  
   }
-  
+  write.csv(input,"manually_annotated_function_outcome.csv",row.names = F)
   return(ret_df)
 }#function
 
