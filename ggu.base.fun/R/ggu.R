@@ -777,6 +777,266 @@ rowpaste <- function(inn){
   return(vvv)
 }
 
+#' Combine tax list
+#'
+#' This function combines different tax dataframes (each as a different element on a list) into a singular dataframe
+#' @param tax_list the list containing multiple tax dataframes. Each tax dataframe needs to contain 7 columns (Kingdom,Phylum,Class,Order,Family,Genus,Species)
+#' @return A dataframe where all the taxonomic information is merged with " | ". Example tax_list[[1]] = "Gadus Morhua" & tax_list[[1]] = "Arctogadus glacialis" the result will be "Gadus Morhua | Arctogadus glacialis" 
+#' @export
+#' @examples
+#' comb_tax <- combine_tax_df(tax_list)
+#' 
+combine_tax_df <- function(tax_list){
+  y <- vector("numeric",length(tax_list))
+  for (i in 1:length(tax_list)) {
+    y[i] <- dim(tax_list[[i]])[1]
+  }
+  if(sum(!duplicated(y))==1){
+    print("row numbers between tax data are the same")
+  }
+  if(sum(!duplicated(y))>1){
+    print("row numbers between tax data are NOT the same");
+    print(y)
+  }
+  for (i in 1:length(tax_list)) {
+    y[i] <- dim(tax_list[[i]])[2]
+  }
+  if(sum(!duplicated(y))==1){
+    print("column numbers between tax data are the same")
+  }
+  if(sum(!duplicated(y))>1){
+    print("column numbers between tax data are NOT the same");
+    print(y)
+  }
+  temp_tax <- as.data.frame(matrix(NA,nrow(tax_list[[1]]),ncol(tax_list[[1]])))
+  colnames(temp_tax) <- colnames(tax_list[[1]])
+  for (j in 1:ncol(tax_list[[1]])) {
+    for (i in 1:nrow(tax_list[[1]])){
+      q <- vector(length = length(tax_list))
+      for (k in 1:length(tax_list)) {
+        q[k] <- !is.na(tax_list[[k]][i,j])
+      }
+      if(sum(q)==1){
+        temp_tax[i,j] <- tax_list[[which(q==T)]][i,j]
+      }
+      if(sum(q)>1){
+        n <- which(q==T)
+        w <- vector("character",length(n))
+        for (m in 1:length(n)) {
+          w[m] <- tax_list[[n[m]]][i,j]
+        }
+        if(sum(!duplicated(w))==1){
+          temp_tax[i,j] <- w[1]
+        }
+        if(sum(!duplicated(w))>1){
+          temp_tax[i,j] <- paste(w[!duplicated(w)],collapse=" | ")
+        }
+      }
+    }
+  }
+  return(temp_tax)
+}
+
+#' Inconsistencies in combining tax lists
+#'
+#' This function creates a dataframe with only the taxa that are not agreeing between blasted and local database results. This function is embedded in tax_blast_compare() function.
+#' @param comb_tax The combined tax dataframe created from combine_tax_df()
+#' @return A dataframe with only the rows where the taxonomic information has multiple information. Example, "Gadus Morhua | Arctogadus glacialis"
+#' @export
+#' @examples
+#' inco_comb_tax <- incos_comb_tax_df(comb_tax)
+#' 
+incos_comb_tax_df <- function(comb_tax){
+  v <- vector("numeric",nrow(comb_tax))
+  for (i in 1:nrow(comb_tax)) {
+    v[i] <- sum(grepl("\\ \\|\\ ",comb_tax[i,]))
+  }
+  comb_tax[v>0,]
+}
+
+#' Selecting the right tax info between combined results
+#'
+#' This function is an interactive script asking for input on chosing the correct taxonomic information when the blasted and the local results are not agreeing
+#' @param comb_tax The combined tax dataframe created from combine_tax_df()
+#' @return A dataframe where all the taxonomic information is merged with " | ". Example tax_list[[1]] = "Gadus Morhua" & tax_list[[1]] = "Arctogadus glacialis" the result will be "Gadus Morhua | Arctogadus glacialis" 
+#' @export
+#' @examples
+#' comb_tax_compared <- tax_blast_compare(comb_tax)
+#' 
+tax_blast_compare <- function(comb_tax){
+  require(dplyr)
+  require(stringr)
+  inco_comb_tax <- incos_comb_tax_df(comb_tax)
+  
+  for (i in 1:nrow(inco_comb_tax)) {
+    xx <- inco_comb_tax[i,] %>% select(colnames(.)[grepl("\\ \\|\\ ",.)])
+    qq <- grepl("\\ \\|\\ ",inco_comb_tax[i,])
+    pp <- as.data.frame(matrix(NA,length(tax_list),ncol(tax_list[[1]])+1)) %>% setNames(c(colnames(tax_list[[1]]),"db"))
+    for (p in 1:length(tax_list)) {
+      pp[p,] <- cbind(tax_list[[p]][as.numeric(rownames(inco_comb_tax[i,])),],names(tax_list)[p]) %>% setNames(c(colnames(.)[-ncol(.)],"db"))
+    }
+    print(pp);cat("\n")
+    vv <- vector("character",ncol(xx))
+    for (j in 1:ncol(xx)) {
+      l <- str_split(xx[j],"\\ \\|\\ ") %>% unlist() %>% as.vector()
+      questions(names(xx[j]));cat("\n")
+      sl <- multi.menu(c(l,"Enter manually"))
+      if(length(sl)==1){
+        if(sl==(length(l)+1)){
+          oo <- readline("Enter manually \n")
+          l <- c(l,oo)
+        }
+        if(sl==0){
+          l <- c(l,"")
+          sl <- ncol(xx)+1
+        }
+        vv[j] <- l[sl]
+      }
+      if(length(sl)>1){
+        vv[j] <- paste(l[sl],collapse = " | ")
+      }
+    }
+    inco_comb_tax[i,qq] <- vv
+  }
+  comb_tax[as.numeric(rownames(inco_comb_tax)),] <- inco_comb_tax %>% replace_with_na_all(condition = ~.x == "")
+  return(comb_tax)
+}
+
+
+#' Creates a single vector with all the taxonomic info
+#'
+#' This function collapses all the taxonomic information (all 7 columns mentioned in combine_tax_df()) into 1 string separated with "/". Can be used on dataframes as well where each row becomes one string of a vector (of length = nrow(df))
+#' @param comb_tax The combined tax dataframe created from combine_tax_df()
+#' @return A vector of length = nrow(input_df) where all the taxonomic information is concatenated into 1 string separated with "/"
+#' @export
+#' @examples
+#' comb_tax[!duplicated(tax_to_vector(comb_tax[,1:7])),]
+#' 
+tax_to_vector <- function(comb_tax){
+  vv <- vector("character",nrow(comb_tax))
+  for (i in 1:nrow(comb_tax)) {
+    vv[i] <- paste(comb_tax[i,],collapse = "/")
+  }
+  return(vv)
+}
+
+#' Converts edna dataframe into OTU dataframe
+#'
+#' This function selects only the columns where the samples are using "taxid" ans "seq_length"
+#' @param edna_df The edna dataframe
+#' @return OTU dataframe
+#' @export
+#' @examples
+#' otu <- coll_sim2(edna_to_otu(edna),tax_to_vector(comb_tax_compared))
+#' colSums(edna_to_otu(edna))
+edna_to_otu <- function(edna_df){
+  require(dplyr)
+  otu <- edna_df %>% select(colnames(.)[(which(colnames(.)=="taxid")+1):(which(colnames(.)=="seq_length")-1)])
+  return(otu)
+}
+
+#' Collapses dataframe 2
+#'
+#' This function Collapses a dataframe based on a similar vector
+#' @param db the database needed to be collapsed
+#' @param sim The vector which similarities are taken from
+#' @return A database with collapsed rows (Fun = sum) based on the vector
+#' @export
+#' @examples
+#' otu <- coll_sim2(edna_to_otu(edna),tax_to_vector(comb_tax_compared))
+coll_sim2 <- function(db,sim){
+  l <- unique(sim); #l <- l[-1]
+  otu_coll <- data.frame(matrix(0, length(l), ncol(db)))
+  colnames(otu_coll) <- colnames(db);#colnames(tax_coll) <- colnames(tax)
+  rownames(otu_coll) <- l
+  for (i in 1:length(l)) {
+    otu_coll[i,] <- colSums(db[sim%in%l[i],])
+  }
+  return(otu_coll)
+}
+
+#' Get Taxonomic Tree
+#'
+#' This function searches for the taxonomic tree of a species
+#' @param input Either a single species or an entire vector with species
+#' @return A dataframe with 7 columns (Kingdom,Phylum,Class,Order,Family,Genus,Species)
+#' @export
+#' @examples
+#' get_tax_tree(tax$species)
+get_tax_tree <- function(input){
+  require(taxize)
+  require(dplyr)
+  tax_temp <- as.data.frame(matrix(NA,0,9)) %>% setNames(.,c("db","queury","kingdom","phylum","class","order","family","genus","species"))
+  for (i in 1:length(input)) {
+    tax_temp[i,] <- tax_name(input[i],c("kingdom","phylum","class","order","family","genus","species"))
+    write.csv(tax_temp,"tax_temp_delete.csv",row.names = T)
+  }
+  tax_temp <- read.csv("tax_temp_delete.csv",row.names = "X")
+  unlink("tax_temp_delete.csv")
+  return(tax_temp)
+}
+
+#' Split vector to dataframe
+#'
+#' This function splits a vector based on a character and the output is a dataframe
+#' @param input_vector A vector with elemets to be split
+#' @return A dataframe with all elements splitted from the vector, each in a new column
+#' @export
+#' @examples
+#' split_df(blast$annotated_name,sep="\\ \\ \\|\\|\\ \\ ")
+split_df <- function(input_vector,sep="_"){
+  require(dplyr)
+  require(naniar)
+  require(stringr)
+  temp <- str_split_fixed(input_vector,sep,n=10) %>% as.data.frame() %>% 
+    replace_with_na_all(condition = ~.x == "")
+  temp <- temp[,colSums(is.na(temp))<nrow(temp)] %>% as.data.frame()
+  return(temp)
+}
+
+#' Colmin
+#'
+#' This function computes the column minimum
+#' @param input A dataframe (numeric)
+#' @return A vector with column minimums
+#' @export
+#' @examples
+#' colmin(OTU)
+colmin <- function(input){
+  temp <- NA
+  for (i in 1:ncol(input)) {
+    temp[i] <- min(input[,i])
+  }
+  return(temp)
+}
+
+#' Colmax
+#'
+#' This function computes the column maximum
+#' @param input A dataframe (numeric)
+#' @return A vector with column maximums
+#' @export
+#' @examples
+#' colmin(OTU)
+colmax <- function(input){
+  temp <- NA
+  for (i in 1:ncol(input)) {
+    temp[i] <- max(input[,i])
+  }
+  return(temp)
+}
+
+#' Unique length
+#'
+#' This function gives the length of unique elements in a vector
+#' @param input A vector
+#' @return A number of unique elements in the input vector
+#' @export
+#' @examples
+#' colmin(OTU)
+le <- function(input){
+  return(length(unique(input)))
+}
 
 #' Annotate blast results
 #'
