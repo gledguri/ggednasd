@@ -713,13 +713,18 @@ clean.otu<-function(otu,tax){
 #' @examples
 #' clean.otu(otu,tax)
 #' taxa_removed <- clean.otu(otu,tax)
-inv.trans <- function(input.X,input.Y,input.Z){
-  output <- as.data.frame(matrix(NA,length(unique(input.X)),length(unique(input.Y))))
+inv.trans <- function(input.X, input.Y, input.Z){
+  output <- as.data.frame(matrix(NA, nrow = length(unique(input.X)), ncol = length(unique(input.Y))))
   rownames(output) <- unique(input.X)
   colnames(output) <- unique(input.Y)
+  
   for (i in rownames(output)) {
     for (j in colnames(output)) {
-      output[i,j] <- input.Z[input.X==i&input.Y==j]
+      if (length(input.Z[input.X == i & input.Y == j]) == 0) {
+        output[i, j] <- 0
+      } else{
+        output[i, j] <- input.Z[input.X == i & input.Y == j]
+      }
     }
   }
   return(output)
