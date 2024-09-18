@@ -1126,7 +1126,8 @@ custom_cbind <- function(q_1, w_1) {
   }
   
   # Bind the rows together
-  result <- left_join(q_1 %>% rownames_to_column('j'),w_1 %>% rownames_to_column('j'),by='j')
+  result <- left_join(q_1 %>% rownames_to_column('j'),w_1 %>% rownames_to_column('j'),by='j') %>% 
+    column_to_rownames('j')
   # result <- cbind(q_1, w_1)
   return(result)
 }
