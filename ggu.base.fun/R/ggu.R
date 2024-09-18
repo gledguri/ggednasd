@@ -1043,6 +1043,95 @@ le <- function(input){
   return(length(unique(input)))
 }
 
+#' Custom rbind Function for Dataframes with Different Columns
+#'
+#' This function combines two dataframes with different columns by adding
+#' the missing columns with \code{NA} values and then performing a row bind
+#' on the resulting dataframes.
+#'
+#' @param df1 A dataframe. The first dataframe to be row-bound.
+#' @param df2 A dataframe. The second dataframe to be row-bound.
+#'
+#' @return A dataframe that is the result of row-binding \code{df1} and \code{df2}.
+#'         If the dataframes have different columns, missing columns in each dataframe
+#'         will be added with \code{NA} values before binding.
+#'
+#' @examples
+#' df1 <- data.frame(A = 1:3, B = letters[1:3])
+#' df2 <- data.frame(A = 4:5, C = letters[4:5])
+#' 
+#' custom_rbind(df1, df2)
+#' 
+#' @export
+custom_rbind <- function(df1, df2) {
+  
+  # Find columns in df1 that are not in df2
+  cols_df1_not_in_df2 <- setdiff(names(df1), names(df2))
+  
+  # Find columns in df2 that are not in df1
+  cols_df2_not_in_df1 <- setdiff(names(df2), names(df1))
+  
+  # Add missing columns to df2 with NA values
+  if (length(cols_df1_not_in_df2) > 0) {
+    df2[cols_df1_not_in_df2] <- NA
+  }
+  
+  # Add missing columns to df1 with NA values
+  if (length(cols_df2_not_in_df1) > 0) {
+    df1[cols_df2_not_in_df1] <- NA
+  }
+  
+  # Bind the rows together
+  result <- rbind(df1, df2)
+  
+  return(result)
+}
+
+#' Custom cbind Function for Dataframes with Different Rows
+#'
+#' This function combines two dataframes with different rows by adding
+#' the missing rows with \code{NA} values and then performing a column bind
+#' on the resulting dataframes.
+#'
+#' @param q_1 A dataframe. The first dataframe to be column-bound.
+#' @param w_1 A dataframe. The second dataframe to be column-bound.
+#'
+#' @return A dataframe that is the result of column-binding \code{q_1} and \code{w_1}.
+#'         If the dataframes have different rows, missing rows in each dataframe
+#'         will be added with \code{NA} values before binding.
+#'
+#' @examples
+#' q_1 <- data.frame(A = 1:3, B = letters[1:3])
+#' w_1 <- data.frame(C = 4:5, D = letters[4:5])
+#' 
+#' custom_cbind(q_1, w_1)
+#' 
+#' @export
+custom_cbind <- function(q_1, w_1) {
+  
+  # Find columns in q_1 that are not in w_1
+  rows_q_1_not_in_w_1 <- setdiff(rownames(q_1), rownames(w_1))
+  
+  # Find columns in w_1 that are not in q_1
+  rows_w_1_not_in_q_1 <- setdiff(rownames(w_1), rownames(q_1))
+  
+  # Add missing columns to w_1 with NA values
+  if (length(rows_q_1_not_in_w_1) > 0) {
+    w_1[rows_q_1_not_in_w_1,] <- NA
+  }
+  
+  # Add missing columns to q_1 with NA values
+  if (length(rows_w_1_not_in_q_1) > 0) {
+    q_1[rows_w_1_not_in_q_1,] <- NA
+  }
+  
+  # Bind the rows together
+  result <- left_join(q_1 %>% rownames_to_column('j'),w_1 %>% rownames_to_column('j'),by='j')
+  # result <- cbind(q_1, w_1)
+  return(result)
+}
+
+
 #' Annotate blast results
 #'
 #' This function reads blasts results and automatically or manually annotates the blasted sequences
