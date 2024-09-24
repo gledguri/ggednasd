@@ -1106,6 +1106,8 @@ custom_rbind <- function(df1, df2) {
 #' 
 #' custom_cbind(q_1, w_1)
 custom_cbind <- function(q_1, w_1) {
+  if (!require("tibble")) {install.packages("tibble",dependencies = TRUE);require("tibble")}
+  if (!require("dplyr")) {install.packages("dplyr",dependencies = TRUE);require("dplyr")}
   
   # Find columns in q_1 that are not in w_1
   rows_q_1_not_in_w_1 <- setdiff(rownames(q_1), rownames(w_1))
