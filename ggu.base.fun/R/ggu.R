@@ -1056,13 +1056,12 @@ le <- function(input){
 #'         If the dataframes have different columns, missing columns in each dataframe
 #'         will be added with \code{NA} values before binding.
 #'
+#' @export
 #' @examples
 #' df1 <- data.frame(A = 1:3, B = letters[1:3])
 #' df2 <- data.frame(A = 4:5, C = letters[4:5])
 #' 
 #' custom_rbind(df1, df2)
-#' 
-#' @export
 custom_rbind <- function(df1, df2) {
   
   # Find columns in df1 that are not in df2
@@ -1100,13 +1099,12 @@ custom_rbind <- function(df1, df2) {
 #'         If the dataframes have different rows, missing rows in each dataframe
 #'         will be added with \code{NA} values before binding.
 #'
+#' @export
 #' @examples
 #' q_1 <- data.frame(A = 1:3, B = letters[1:3])
 #' w_1 <- data.frame(C = 4:5, D = letters[4:5])
 #' 
 #' custom_cbind(q_1, w_1)
-#' 
-#' @export
 custom_cbind <- function(q_1, w_1) {
   
   # Find columns in q_1 that are not in w_1
